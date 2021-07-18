@@ -40,10 +40,41 @@ class _TodoListPageState extends State<TodoListPage> {
       body: ListView.builder(
         itemCount: todoList.length,
         itemBuilder: (context, index) {
-          return Card(
-            child: ListTile(
-              title: Text(todoList[index]),
-            ),
+          return Dismissible(
+            key: ObjectKey(todoList[index]),
+
+            // onDismissedの中にスワイプされた時の動作を記述する。
+            // directionにはスワイプの方向が入るため、方向によって処理を分けることができる。
+            onDismissed: (direction) {
+              setState(() {
+                // スワイプされた要素をデータから削除する
+                todoList.removeAt(index);
+              });
+              if (direction == DismissDirection.endToStart) {
+                Scaffold.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Deleted"),
+                      duration: const Duration(seconds: 1),
+                    )
+                );
+                // スワイプ方向がstartToEnd（画面右から左）の場合の処理
+              } else {
+                Scaffold.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Finished"),
+                      duration: const Duration(seconds: 1),
+                    )
+                );
+              }
+            },
+            background: Container(color: Colors.green),
+            secondaryBackground: Container(color: Colors.red),
+
+            child: Card(
+              child: ListTile(
+                title: Text(todoList[index]),
+              ),
+            )
           );
         },
       ),
